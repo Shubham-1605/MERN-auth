@@ -4,7 +4,7 @@ import "dotenv/config";
 import cookieParser from "cookie-parser";  
 
 import connectDB from "./config/mongodb.js";
-import authRouter from "./routes/AuthRoutes.js";
+import authRouter from "./routes/authRoutes.js";
 import userRouter from "./routes/userRoutes.js";
 
 const app = express();
