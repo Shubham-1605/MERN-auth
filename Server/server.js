@@ -13,19 +13,18 @@ connectDB();
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, curl, Postman)
     if (!origin) return callback(null, true);
 
     const isAllowed =
       origin === "http://localhost:5173" ||
       origin === "http://localhost:4000" ||
-      /^https:\/\/mern-auth[a-z0-9-]*\.vercel\.app$/.test(origin) || // ✅ All mern-auth Vercel URLs
-      (process.env.CLIENT_URL && origin === process.env.CLIENT_URL);  // ✅ Env var fallback
+      /^https:\/\/mern-auth[a-z0-9-]*\.vercel\.app$/.test(origin) ||
+      (process.env.CLIENT_URL && origin === process.env.CLIENT_URL);
 
     if (isAllowed) {
       callback(null, true);
     } else {
-      console.error(`CORS blocked for origin: ${origin}`); // helpful for debugging
+      console.error(`CORS blocked for origin: ${origin}`);
       callback(new Error(`CORS policy: origin ${origin} not allowed`));
     }
   },
@@ -34,14 +33,13 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
 };
 
-// ✅ Handle preflight requests explicitly (critical for Render deployments)
-app.options("*", cors(corsOptions));
+// ✅ Fixed wildcard syntax for Express v5
+app.options("(.*)", cors(corsOptions));
 
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-// API endpoints
 app.get("/", (req, res) => res.send("API working fine"));
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
