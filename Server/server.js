@@ -11,18 +11,25 @@ const app = express();
 const port = process.env.PORT || 4000;
 connectDB();
 
-// ✅ Fix 1: Add your Vercel client URL to allowedOrigins
+
 const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:4000',
-  'https://mern-auth-ctfun8n83-shubham-kumars-projects-f76eb912.vercel.app',
-  'https://mern-auth-orpin-mu.vercel.app',
-  process.env.CLIENT_URL  // add this env variable on Vercel after client is deployed
-];
+  "http://localhost:5173",
+  "http://localhost:4000",
+  "https://mern-auth-ctfun8n83-shubham-kumars-projects-f76eb912.vercel.app",
+  "https://mern-auth-orpin-mu.vercel.app",
+].filter(Boolean);
+
+if (process.env.CLIENT_URL) {
+  allowedOrigins.push(process.env.CLIENT_URL);
+}
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 // API endpoints
 app.get("/", (req, res) => res.send("API working fine"));
