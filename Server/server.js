@@ -11,15 +11,25 @@ const app = express();
 const port = process.env.PORT || 4000;
 connectDB();
 
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:4000'];
+// ✅ Fix 1: Add your Vercel client URL to allowedOrigins
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:4000',
+  process.env.CLIENT_URL  // add this env variable on Vercel after client is deployed
+];
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({origin:allowedOrigins, credentials: true}));
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 
-//API endpoints
-app.get("/", (req,res)=> res.send("API working fine"));
+// API endpoints
+app.get("/", (req, res) => res.send("API working fine"));
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 
-app.listen(port, ()=> console.log(`Server is running on port ${port}`));
+// ✅ Fix 2: Keep listen for local dev but also export app for Vercel
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, () => console.log(`Server is running on port ${port}`));
+}
+
+export default app; // ✅ Fix 3: Export app for Vercel serverless
