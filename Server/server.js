@@ -11,24 +11,18 @@ const app = express();
 const port = process.env.PORT || 4000;
 connectDB();
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:4000",
-  "https://mern-auth-ctfun8n83-shubham-kumars-projects-f76eb912.vercel.app",
-  "https://mern-auth-orpin-mu.vercel.app",
-];
-
-// Add env var origin if set (avoid duplicates)
-if (process.env.CLIENT_URL && !allowedOrigins.includes(process.env.CLIENT_URL)) {
-  allowedOrigins.push(process.env.CLIENT_URL);
-}
-
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (mobile apps, curl, Postman)
     if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.includes(origin)) {
+
+    const isAllowed =
+      origin === "http://localhost:5173" ||
+      origin === "http://localhost:4000" ||
+      /^https:\/\/mern-auth[a-z0-9-]*\.vercel\.app$/.test(origin) || // ✅ All mern-auth Vercel URLs
+      (process.env.CLIENT_URL && origin === process.env.CLIENT_URL);  // ✅ Env var fallback
+
+    if (isAllowed) {
       callback(null, true);
     } else {
       console.error(`CORS blocked for origin: ${origin}`); // helpful for debugging
