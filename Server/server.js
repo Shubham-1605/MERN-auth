@@ -11,10 +11,33 @@ const app = express();
 const port = process.env.PORT || 4000;
 connectDB();
 
+// ✅ Manual header middleware FIRST - before everything else
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  const isAllowed =
+    origin === "http://localhost:5173" ||
+    origin === "http://localhost:4000" ||
+    /^https:\/\/mern-auth[a-z0-9-]*\.vercel\.app$/.test(origin) ||
+    (process.env.CLIENT_URL && origin === process.env.CLIENT_URL);
+
+  if (isAllowed) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization,Cookie");
+  }
+
+  // Handle preflight
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
+
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-
     const isAllowed =
       origin === "http://localhost:5173" ||
       origin === "http://localhost:4000" ||
@@ -33,9 +56,7 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
 };
 
-// ✅ Fixed wildcard syntax for Express v5
 app.options("(.*)", cors(corsOptions));
-
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
