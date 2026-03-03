@@ -16,6 +16,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:4000',
   'https://mern-auth-ctfun8n83-shubham-kumars-projects-f76eb912.vercel.app',
+  'https://mern-auth-orpin-mu.vercel.app/',
   process.env.CLIENT_URL  // add this env variable on Vercel after client is deployed
 ];
 
